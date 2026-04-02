@@ -19,7 +19,7 @@ A comprehensive full-stack web application designed to organize and optimize the
 ### 1. Database Setup
 1. Clone the Repository. Ensure you have install MySQL Server and it is running.
 
-2. Open the terminal, navigate to the project root folder ```bash /Job-Application-Tracker```, and run the schema script to create the database and tables:
+2. Open the terminal, navigate to the project root folder ```/Job-Application-Tracker```, and run the schema script to create the database and tables:
    - **macOS/Linux:** `mysql -u root -p < schema.sql`
    - **Windows:** `mysql -u root -p < schema.sql` (Ensure MySQL is in your System PATH)
 
