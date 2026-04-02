@@ -1,20 +1,40 @@
 {% extends "base.html" %}
-
 {% block title %}Companies{% endblock %}
 
 {% block content %}
 <h1>Company Management</h1>
 
-<div class="card" style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
-    <h3>Add New Company</h3>
+<div class="card {% if edit_mode %}edit-highlight{% endif %}" style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+    <h3>{% if edit_mode %}Editing: {{ edit_mode.company_name }}{% else %}Add New Company{% endif %}</h3>
+    
     <form method="POST" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-        <input type="text" name="company_name" placeholder="Company Name" required style="padding: 10px;">
-        <input type="text" name="industry" placeholder="Industry" style="padding: 10px;">
-        <input type="url" name="website" placeholder="Website (https://...)" style="padding: 10px;">
-        <input type="text" name="city" placeholder="City" style="padding: 10px;">
-        <input type="text" name="state" placeholder="State" style="padding: 10px;">
-        <textarea name="notes" placeholder="Notes" style="grid-column: span 2; padding: 10px;"></textarea>
-        <button type="submit" class="btn btn-primary" style="grid-column: span 2;">Save Company</button>
+        <input type="hidden" name="company_id" value="{{ edit_mode.company_id if edit_mode else '' }}">
+
+        <input type="text" name="company_name" placeholder="Company Name" required 
+               value="{{ edit_mode.company_name if edit_mode else '' }}" style="padding: 10px;">
+        
+        <input type="text" name="industry" placeholder="Industry" 
+               value="{{ edit_mode.industry if edit_mode else '' }}" style="padding: 10px;">
+        
+        <input type="url" name="website" placeholder="Website" 
+               value="{{ edit_mode.website if edit_mode else '' }}" style="padding: 10px;">
+        
+        <input type="text" name="city" placeholder="City" 
+               value="{{ edit_mode.city if edit_mode else '' }}" style="padding: 10px;">
+        
+        <input type="text" name="state" placeholder="State" 
+               value="{{ edit_mode.state if edit_mode else '' }}" style="padding: 10px;">
+        
+        <textarea name="notes" placeholder="Notes" style="grid-column: span 2; padding: 10px;">{{ edit_mode.notes if edit_mode else '' }}</textarea>
+        
+        <div style="grid-column: span 2; display: flex; gap: 10px;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">
+                {% if edit_mode %}Save Changes{% else %}Add Company{% endif %}
+            </button>
+            {% if edit_mode %}
+                <a href="{{ url_for('companies') }}" class="btn btn-cancel" style="flex: 1;">Cancel Edit</a>
+            {% endif %}
+        </div>
     </form>
 </div>
 
@@ -26,7 +46,6 @@
                 <th>Name</th>
                 <th>Industry</th>
                 <th>Location</th>
-                <th>Website</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -36,16 +55,19 @@
                 <td><strong>{{ company.company_name }}</strong></td>
                 <td>{{ company.industry }}</td>
                 <td>{{ company.city }}, {{ company.state }}</td>
-                <td><a href="{{ company.website }}" target="_blank">Visit Site</a></td>
                 <td>
-                    <a href="#" class="btn" style="background: #e2e8f0; color: #475569;">Edit</a>
-                    <a href="#" class="btn btn-danger">Delete</a>
+                    <a href="{{ url_for('companies', edit=company.company_id) }}" class="btn" style="background: #e2e8f0; color: #475569;">Edit</a>
+                    <a href="{{ url_for('delete_company_route', id=company.company_id) }}" 
+                       class="btn btn-danger" 
+                       onclick="return confirm('Are you sure?')">Delete</a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 {% else %}
-    <p>No companies found. Use the form above to add your first one!</p>
+    <div style="background: #fff; padding: 40px; text-align: center; border-radius: 8px; border: 1px dashed #ccc;">
+        <p style="color: #64748b;">No companies found. Use the form above to add your first one!</p>
+    </div>
 {% endif %}
 {% endblock %}

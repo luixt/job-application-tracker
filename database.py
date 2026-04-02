@@ -85,6 +85,24 @@ def create_company(data):
     )
     return execute_query(query, params)
 
+def get_company_by_id(company_id):
+    """Fetches a single company for the Edit form."""
+    query = "SELECT * FROM companies WHERE company_id = %s"
+    result = execute_query(query, (company_id,), fetch=True)
+    return result[0] if result else None
+
+def update_company(company_id, data):
+    query = """
+        UPDATE companies 
+        SET company_name=%s, industry=%s, website=%s, city=%s, state=%s, notes=%s
+        WHERE company_id=%s
+    """
+    params = (
+        data['name'], data['industry'], data['website'], 
+        data['city'], data['state'], data['notes'], company_id
+    )
+    return execute_query(query, params)
+
 def delete_company(company_id):
     return execute_query("DELETE FROM companies WHERE company_id = %s", (company_id,))
 
