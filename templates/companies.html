@@ -40,31 +40,43 @@
 
 <h2>Registered Companies</h2>
 {% if companies %}
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Industry</th>
-                <th>Location</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for company in companies %}
-            <tr>
-                <td><strong>{{ company.company_name }}</strong></td>
-                <td>{{ company.industry }}</td>
-                <td>{{ company.city }}, {{ company.state }}</td>
-                <td>
-                    <a href="{{ url_for('companies', edit=company.company_id) }}" class="btn" style="background: #e2e8f0; color: #475569;">Edit</a>
-                    <a href="{{ url_for('delete_company_route', id=company.company_id) }}" 
-                       class="btn btn-danger" 
-                       onclick="return confirm('Are you sure?')">Delete</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Company & Industry</th>
+                    <th>Location</th>
+                    <th>Notes</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for company in companies %}
+                <tr>
+                    <td>
+                        <strong>{{ company.company_name }}</strong>
+                        <span class="text-secondary">{{ company.industry or 'Industry not set' }}</span>
+                        {% if company.website %}
+                            <a href="{{ company.website }}" target="_blank" style="font-size: 0.8rem;">Visit Website ↗</a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ company.city }}{% if company.city and company.state %}, {% endif %}{{ company.state }}
+                    </td>
+                    <td style="max-width: 250px;">
+                        <small class="text-secondary">{{ company.notes or 'No notes added.' }}</small>
+                    </td>
+                    <td style="text-align: right;">
+                        <a href="{{ url_for('companies', edit=company.company_id) }}" class="btn btn-edit">Edit</a>
+                        <a href="{{ url_for('delete_company_route', id=company.company_id) }}" 
+                        class="btn btn-danger" style="padding: 5px 10px;"
+                        onclick="return confirm('Delete company?')">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% else %}
     <div style="background: #fff; padding: 40px; text-align: center; border-radius: 8px; border: 1px dashed #ccc;">
         <p style="color: #64748b;">No companies found. Use the form above to add your first one!</p>

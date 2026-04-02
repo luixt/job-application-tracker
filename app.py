@@ -9,6 +9,10 @@ from database import (
 app = Flask(__name__)
 app.secret_key = 'supersecretkey' # Required for session-based flash messages
 
+@app.template_filter('from_json')
+def from_json_filter(value):
+    return json.loads(value) if value else []
+
 # --- DASHBOARD ---
 @app.route('/')
 def dashboard():
@@ -131,6 +135,7 @@ def delete_job_route(id):
     flash("Job deleted.", "danger")
     return redirect(url_for('jobs'))
 
+# --- APPLICATIONS ---
 @app.route('/applications')
 def applications():
     return render_template('applications.html')

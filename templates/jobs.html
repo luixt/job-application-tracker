@@ -57,29 +57,59 @@
 
 <h2>Current Listings</h2>
 {% if jobs %}
-    <table>
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Company</th>
-                <th>Type</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for job in jobs %}
-            <tr>
-                <td><strong>{{ job.job_title }}</strong></td>
-                <td>{{ job.company_name }}</td>
-                <td>{{ job.job_type }}</td>
-                <td>
-                    <a href="{{ url_for('jobs', edit=job.job_id) }}" class="btn" style="background: #e2e8f0; color: #475569;">Edit</a>
-                    <a href="{{ url_for('delete_job_route', id=job.job_id) }}" class="btn btn-danger" onclick="return confirm('Delete this job?')">Delete</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Job Title & Company</th>
+                    <th>Type & Salary</th>
+                    <th>Skills Required</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in jobs %}
+                <tr>
+                    <td>
+                        {% if job.job_url %}
+                            <a href="{{ job.job_url }}" target="_blank" class="job-link">
+                                <strong>{{ job.job_title }}</strong> <small>↗</small>
+                            </a>
+                        {% else %}
+                            <strong>{{ job.job_title }}</strong>
+                        {% endif %}
+                        
+                        <span class="text-secondary">{{ job.company_name }}</span>
+                        <span class="text-secondary" style="font-size: 0.75rem;">Posted: {{ job.date_posted }}</span>
+                    </td>
+                    <td>
+                        <span class="badge">{{ job.job_type }}</span>
+                        <br></br>
+                        <div class="salary-tag">
+                            {% if job.salary_min %}
+                                ${{ "{:,}".format(job.salary_min) }} - ${{ "{:,}".format(job.salary_max) }}
+                            {% else %}
+                                <span class="text-secondary">Salary N/A</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                            {% set skills = job.requirements | from_json %}
+                            {% for skill in skills %}
+                                <span class="badge" style="font-size: 0.7rem; background: #f1f5f9;">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td style="text-align: right;">
+                        <a href="{{ url_for('jobs', edit=job.job_id) }}" class="btn btn-edit">Edit</a>
+                        <a href="{{ url_for('delete_job_route', id=job.job_id) }}" class="btn btn-danger" style="padding: 5px 10px;" onclick="return confirm('Delete job?')">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% else %}
     <p>No jobs found.</p>
 {% endif %}
