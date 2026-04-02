@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 # Load variables from .env file
 load_dotenv()
 
+# DATABASE CONNECTION AND QUERY FUNCTIONS
 def get_db_connection():
     """
     Establishes and returns a connection to the MySQL database.
@@ -44,6 +45,30 @@ def execute_query(query, params=None, fetch=False):
     finally:
         cursor.close()
         conn.close()
+
+    
+# DASHBOARD DATA LOGIC
+def get_dashboard_stats():
+    """Fetches counts for companies, jobs, and applications."""
+    comp_count = execute_query("SELECT COUNT(*) as count FROM companies", fetch=True)[0]['count']
+    job_count = execute_query("SELECT COUNT(*) as count FROM jobs", fetch=True)[0]['count']
+    app_count = execute_query("SELECT COUNT(*) as count FROM applications", fetch=True)[0]['count']
+    return {
+        'companies': comp_count,
+        'jobs': job_count,
+        'applications': app_count
+    }
+
+def get_recent_applications(limit=5):
+    """Fetches the most recent job applications with joined company names."""
+    query = """
+        SELECT a.application_date, j.job_title, c.company_name, a.status 
+        FROM applications a
+        JOIN jobs j ON a.job_id = j.job_id
+        JOIN companies c ON j.company_id = c.company_id
+        ORDER BY a.application_date DESC LIMIT %s
+    """
+    return execute_query(query, (limit,), fetch=True)
 
 # COMPANIES DATA LOGIC
 def get_all_companies():
