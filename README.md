@@ -57,10 +57,10 @@ pip install -r requirements.txt
 ### 4. Running the Application
 Once the database is set up and the environment is active:
 
-1. Start the Flask server:
+1. Run the program:
 
 ```Bash
-flask run --debug
+Python app.py
 ```
 
 2. Open your browser and navigate to: http://127.0.0.1:5000
