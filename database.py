@@ -189,3 +189,35 @@ def delete_application(app_id):
     return execute_query("DELETE FROM applications WHERE application_id = %s", (app_id,))
 
 # CONTACTS DATA LOGIC
+def get_all_contacts():
+    """Fetches all contacts joined with their company names."""
+    query = """
+        SELECT c.*, comp.company_name 
+        FROM contacts c
+        JOIN companies comp ON c.company_id = comp.company_id
+        ORDER BY c.contact_name ASC
+    """
+    return execute_query(query, fetch=True)
+
+def get_contact_by_id(contact_id):
+    return execute_query("SELECT * FROM contacts WHERE contact_id = %s", (contact_id,), fetch=True)[0]
+
+def create_contact(data):
+    query = """
+        INSERT INTO contacts (company_id, contact_name, title, email, phone, linkedin_url, notes)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+    """
+    params = (data['company_id'], data['name'], data['title'], data['email'], data['phone'], data['linkedin'], data['notes'])
+    return execute_query(query, params)
+
+def update_contact(contact_id, data):
+    query = """
+        UPDATE contacts 
+        SET company_id=%s, contact_name=%s, title=%s, email=%s, phone=%s, linkedin_url=%s, notes=%s
+        WHERE contact_id=%s
+    """
+    params = (data['company_id'], data['name'], data['title'], data['email'], data['phone'], data['linkedin'], data['notes'], contact_id)
+    return execute_query(query, params)
+
+def delete_contact(contact_id):
+    return execute_query("DELETE FROM contacts WHERE contact_id = %s", (contact_id,))

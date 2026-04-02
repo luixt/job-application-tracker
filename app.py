@@ -5,7 +5,8 @@ from database import (
     create_company, get_company_by_id, update_company, delete_company, 
     get_all_jobs, create_job, delete_job, get_job_by_id, update_job,
     get_all_applications, get_application_by_id, create_application, 
-    update_application, delete_application
+    update_application, delete_application, get_all_contacts, get_contact_by_id, 
+    create_contact, update_contact, delete_contact
 )
 
 app = Flask(__name__)
@@ -178,10 +179,46 @@ def delete_application_route(id):
 
 
 # --- CONTACTS ---
-@app.route('/contacts')
+@app.route('/contacts', methods=['GET', 'POST'])
 def contacts():
-    return render_template('contacts.html')
+    edit_id = request.args.get('edit')
+    contact_to_edit = None
+    if edit_id:
+        contact_to_edit = get_contact_by_id(edit_id)
 
+    if request.method == 'POST':
+        contact_data = {
+            'company_id': request.form.get('company_id'),
+            'name': request.form.get('contact_name'),
+            'title': request.form.get('title'),
+            'email': request.form.get('email'),
+            'phone': request.form.get('phone'),
+            'linkedin': request.form.get('linkedin_url'),
+            'notes': request.form.get('notes')
+        }
+        
+        contact_id = request.form.get('contact_id')
+        if contact_id:
+            update_contact(contact_id, contact_data)
+            flash(f"Contact '{contact_data['name']}' updated!", "success")
+        else:
+            create_contact(contact_data)
+            flash(f"Contact '{contact_data['name']}' added!", "success")
+        return redirect(url_for('contacts'))
+
+    return render_template('contacts.html', 
+                           contacts=get_all_contacts(),
+                           companies=get_all_companies(),
+                           edit_mode=contact_to_edit)
+
+@app.route('/contacts/delete/<int:id>')
+def delete_contact_route(id):
+    delete_contact(id)
+    flash("Contact removed.", "danger")
+    return redirect(url_for('contacts'))
+
+
+# -- MATCHING JOB ---
 @app.route('/match')
 def job_match():
     return render_template('job_match.html')

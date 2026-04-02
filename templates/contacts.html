@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Networking Contacts{% endblock %}
+
+{% block content %}
+<h1>Networking & Contacts</h1>
+
+<div class="card {% if edit_mode %}edit-highlight{% endif %}" style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+    <h3>{% if edit_mode %}Edit Contact: {{ edit_mode.contact_name }}{% else %}Add New Contact{% endif %}</h3>
+    <form method="POST" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <input type="hidden" name="contact_id" value="{{ edit_mode.contact_id if edit_mode else '' }}">
+
+        <select name="company_id" required style="padding: 10px;">
+            <option value="">-- Select Company --</option>
+            {% for company in companies %}
+                <option value="{{ company.company_id }}" {% if edit_mode and edit_mode.company_id == company.company_id %}selected{% endif %}>
+                    {{ company.company_name }}
+                </option>
+            {% endfor %}
+        </select>
+        
+        <input type="text" name="contact_name" placeholder="Full Name (Required)" required style="padding: 10px;"
+               value="{{ edit_mode.contact_name if edit_mode else '' }}">
+        
+        <input type="text" name="title" placeholder="Job Title (e.g. HR Manager)" style="padding: 10px;"
+               value="{{ edit_mode.title if edit_mode else '' }}">
+        
+        <input type="email" name="email" placeholder="Email Address" style="padding: 10px;"
+               value="{{ edit_mode.email if edit_mode else '' }}">
+        
+        <input type="text" name="phone" placeholder="Phone Number" style="padding: 10px;"
+               value="{{ edit_mode.phone if edit_mode else '' }}">
+        
+        <input type="url" name="linkedin_url" placeholder="LinkedIn Profile URL" style="padding: 10px;"
+               value="{{ edit_mode.linkedin_url if edit_mode else '' }}">
+        
+        <textarea name="notes" placeholder="Notes (How you met, conversation topics, etc.)" style="grid-column: span 2; padding: 10px;">{{ edit_mode.notes if edit_mode else '' }}</textarea>
+        
+        <div style="grid-column: span 2; display: flex; gap: 10px;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">
+                {% if edit_mode %}Update Contact{% else %}Add Contact{% endif %}
+            </button>
+            {% if edit_mode %}
+                <a href="{{ url_for('contacts') }}" class="btn btn-cancel" style="flex: 1;">Cancel Edit</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Name & Title</th>
+                <th>Company</th>
+                <th>Contact Info</th>
+                <th>Notes</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contact in contacts %}
+            <tr>
+                <td>
+                    {% if contact.linkedin_url %}
+                        <a href="{{ contact.linkedin_url }}" target="_blank" class="job-link">
+                            <strong>{{ contact.contact_name }}</strong> <small>↗</small>
+                        </a>
+                    {% else %}
+                        <strong>{{ contact.contact_name }}</strong>
+                    {% endif %}
+                    <span class="text-secondary">{{ contact.title or 'No Title' }}</span>
+                </td>
+                <td>{{ contact.company_name }}</td>
+                <td>
+                    {% if contact.email %}
+                        <a href="mailto:{{ contact.email }}" class="text-secondary" style="display: block; margin-bottom: 4px;">📧 {{ contact.email }}</a>
+                    {% endif %}
+                    {% if contact.phone %}
+                        <span class="text-secondary" style="display: block;">📞 {{ contact.phone }}</span>
+                    {% endif %}
+                </td>
+                <td style="max-width: 200px;">
+                    <small class="text-secondary">{{ contact.notes or '—' }}</small>
+                </td>
+                <td style="text-align: right;">
+                    <a href="{{ url_for('contacts', edit=contact.contact_id) }}" class="btn btn-edit">Edit</a>
+                    <a href="{{ url_for('delete_contact_route', id=contact.contact_id) }}" class="btn btn-danger" style="padding: 5px 10px;" onclick="return confirm('Delete contact?')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

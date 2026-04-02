@@ -25,27 +25,33 @@
 
 <h2>Recent Activity</h2>
 {% if recent_apps %}
-    <table>
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Company</th>
-                <th>Role</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for app in recent_apps %}
-            <tr>
-                <td>{{ app.application_date }}</td>
-                <td>{{ app.company_name }}</td>
-                <td>{{ app.job_title }}</td>
-                <td><span class="badge">{{ app.status }}</span></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Company</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in recent_apps %}
+                <tr>
+                    <td>{{ app.application_date }}</td>
+                    <td>{{ app.company_name }}</td>
+                    <td><strong>{{ app.job_title }}</strong></td>
+                    <td>
+                        <span class="badge badge-{{ app.status | lower }}">{{ app.status }}</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% else %}
-    <p>No applications tracked yet. Start by adding a company and a job!</p>
+    <div style="background: #fff; padding: 40px; text-align: center; border-radius: 8px; border: 1px dashed #ccc;">
+        <p style="color: #64748b;">No applications tracked yet. Start by adding a company and a job!</p>
+    </div>
 {% endif %}
 {% endblock %}
