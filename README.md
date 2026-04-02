@@ -14,6 +14,10 @@ A comprehensive full-stack web application designed to organize and optimize the
 - **Database**: MySQL 8.0+
 - **Frontend**: HTML, CSS (Custom responsive design)
 
+## 📷 Demo Video
+
+[Click Here](https://drive.google.com/file/d/1kwNQH-gCFvOkcJ5QQUOlOjMPcLaOt6yU/view?usp=sharing)
+
 ## ⚙️ Setup & Installation (Testing)
 
 ### 1. Database Setup
