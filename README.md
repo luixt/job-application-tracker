@@ -22,7 +22,18 @@ search process.
    - **macOS/Linux:** `mysql -u root -p < schema.sql`
    - **Windows:** `mysql -u root -p < schema.sql` (Ensure MySQL is in your System PATH)
 
-### 2. Python Environment Setup
+### 2. Environment Variable (.env)
+
+Create a file named .env in the root directory and add your database credentials:
+
+```plaintext
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_password_here
+DB_NAME=job_tracker
+```
+
+### 3. Python Environment Setup
 #### macOS / Linux
 ```bash
 # Create virtual environment
@@ -31,8 +42,10 @@ python3 -m venv venv
 source venv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
+```
 
 #### Windows
+```bash
 # Create virtual environment
 python -m venv venv
 # Activate it
@@ -41,7 +54,7 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-### 3. Running the Application
+### 4. Running the Application
 Once the database is set up and the environment is active:
 
 1. Start the Flask server:
