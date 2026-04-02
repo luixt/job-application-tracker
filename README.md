@@ -58,7 +58,12 @@ pip install -r requirements.txt
 Once the database is set up and the environment is active:
 
 1. Run the program:
+#### macOS / Linux
+```Bash
+Python3 app.py
+```
 
+#### Windows
 ```Bash
 Python app.py
 ```

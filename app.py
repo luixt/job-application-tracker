@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, redirect, flash, url_for
+from flask import Flask, json, render_template, request, redirect, flash, url_for
 # Import all our data functions from database.py
 from database import (
     get_dashboard_stats, get_recent_applications, get_all_companies, 
-    create_company, get_company_by_id, update_company, delete_company
+    create_company, get_company_by_id, update_company, delete_company, 
+    get_all_jobs, create_job, delete_job, get_job_by_id, update_job
 )
 
 app = Flask(__name__)
@@ -81,10 +82,54 @@ def edit_company(id):
     
     return render_template('edit_company.html', company=company)
 
-# --- PLACEHOLDERS FOR NEXT STEPS ---
-@app.route('/jobs')
+# --- JOBS ---
+# Combined Create/Edit route for Jobs to simplify form handling
+@app.route('/jobs', methods=['GET', 'POST'])
 def jobs():
-    return render_template('jobs.html')
+    edit_id = request.args.get('edit')
+    job_to_edit = None
+
+    if edit_id:
+        job_to_edit = get_job_by_id(edit_id)
+        # Convert JSON requirements back to a string for the form input
+        if job_to_edit and job_to_edit['requirements']:
+            job_to_edit['reqs_str'] = ", ".join(json.loads(job_to_edit['requirements']))
+
+    if request.method == 'POST':
+        skills_list = [s.strip() for s in request.form.get('requirements').split(',') if s.strip()]
+        
+        job_data = {
+            'company_id': request.form.get('company_id'),
+            'title': request.form.get('job_title'),
+            'type': request.form.get('job_type'),
+            's_min': request.form.get('salary_min') or None,
+            's_max': request.form.get('salary_max') or None,
+            'url': request.form.get('job_url'),
+            'date': request.form.get('date_posted'),
+            'reqs': json.dumps(skills_list)
+        }
+        
+        job_id = request.form.get('job_id')
+        if job_id:
+            update_job(job_id, job_data)
+            flash("Job updated successfully!", "success")
+        else:
+            create_job(job_data)
+            flash("Job posted successfully!", "success")
+            
+        return redirect(url_for('jobs'))
+
+    return render_template('jobs.html', 
+                           jobs=get_all_jobs(), 
+                           companies=get_all_companies(), 
+                           edit_mode=job_to_edit)
+
+# Jobs Delete Route
+@app.route('/jobs/delete/<int:id>')
+def delete_job_route(id):
+    delete_job(id)
+    flash("Job deleted.", "danger")
+    return redirect(url_for('jobs'))
 
 @app.route('/applications')
 def applications():

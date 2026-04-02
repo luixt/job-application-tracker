@@ -106,3 +106,49 @@ def update_company(company_id, data):
 def delete_company(company_id):
     return execute_query("DELETE FROM companies WHERE company_id = %s", (company_id,))
 
+# JOBS DATA LOGIC
+def get_all_jobs():
+    """Fetches all jobs joined with their company names."""
+    query = """
+        SELECT j.*, c.company_name 
+        FROM jobs j
+        JOIN companies c ON j.company_id = c.company_id
+        ORDER BY j.date_posted DESC
+    """
+    return execute_query(query, fetch=True)
+
+def create_job(data):
+    """Inserts a new job. Note: requirements is passed as a JSON string."""
+    query = """
+        INSERT INTO jobs (company_id, job_title, job_type, salary_min, salary_max, job_url, date_posted, requirements)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+    """
+    params = (
+        data['company_id'], data['title'], data['type'],
+        data['s_min'], data['s_max'], data['url'], 
+        data['date'], data['reqs'] # reqs should be a JSON string
+    )
+    return execute_query(query, params)
+
+def get_job_by_id(job_id):
+    """Fetches a single job record."""
+    query = "SELECT * FROM jobs WHERE job_id = %s"
+    result = execute_query(query, (job_id,), fetch=True)
+    return result[0] if result else None
+
+def update_job(job_id, data):
+    """Updates an existing job record."""
+    query = """
+        UPDATE jobs 
+        SET company_id=%s, job_title=%s, job_type=%s, salary_min=%s, 
+            salary_max=%s, job_url=%s, date_posted=%s, requirements=%s
+        WHERE job_id=%s
+    """
+    params = (
+        data['company_id'], data['title'], data['type'], data['s_min'],
+        data['s_max'], data['url'], data['date'], data['reqs'], job_id
+    )
+    return execute_query(query, params)
+
+def delete_job(job_id):
+    return execute_query("DELETE FROM jobs WHERE job_id = %s", (job_id,))

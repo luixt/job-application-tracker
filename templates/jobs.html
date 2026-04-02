@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Jobs{% endblock %}
+
+{% block content %}
+<h1>Job Openings</h1>
+
+<div class="card {% if edit_mode %}edit-highlight{% endif %}" style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+    <h3>{% if edit_mode %}Edit Job: {{ edit_mode.job_title }}{% else %}Add New Job Listing{% endif %}</h3>
+    
+    <form method="POST" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <input type="hidden" name="job_id" value="{{ edit_mode.job_id if edit_mode else '' }}">
+
+        <select name="company_id" required style="padding: 10px;">
+            <option value="">-- Select Company --</option>
+            {% for company in companies %}
+                <option value="{{ company.company_id }}" 
+                    {% if edit_mode and edit_mode.company_id == company.company_id %}selected{% endif %}>
+                    {{ company.company_name }}
+                </option>
+            {% endfor %}
+        </select>
+        
+        <input type="text" name="job_title" placeholder="Job Title" required 
+               value="{{ edit_mode.job_title if edit_mode else '' }}" style="padding: 10px;">
+        
+        <select name="job_type" style="padding: 10px;">
+            {% for type in ['Full-time', 'Part-time', 'Contract', 'Internship'] %}
+                <option value="{{ type }}" {% if edit_mode and edit_mode.job_type == type %}selected{% endif %}>{{ type }}</option>
+            {% endfor %}
+        </select>
+        
+        <input type="date" name="date_posted" required 
+               value="{{ edit_mode.date_posted if edit_mode else '' }}" style="padding: 10px;">
+        
+        <input type="number" name="salary_min" placeholder="Min Salary" 
+               value="{{ edit_mode.salary_min if edit_mode else '' }}" style="padding: 10px;">
+        
+        <input type="number" name="salary_max" placeholder="Max Salary" 
+               value="{{ edit_mode.salary_max if edit_mode else '' }}" style="padding: 10px;">
+        
+        <input type="url" name="job_url" placeholder="Job URL" 
+               value="{{ edit_mode.job_url if edit_mode else '' }}" style="grid-column: span 2; padding: 10px;">
+        
+        <input type="text" name="requirements" placeholder="Skills (comma separated)" 
+               value="{{ edit_mode.reqs_str if edit_mode else '' }}" style="grid-column: span 2; padding: 10px;">
+        
+        <div style="grid-column: span 2; display: flex; gap: 10px;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">
+                {% if edit_mode %}Save Changes{% else %}Post Job{% endif %}
+            </button>
+            {% if edit_mode %}
+                <a href="{{ url_for('jobs') }}" class="btn btn-cancel" style="flex: 1;">Cancel Edit</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<h2>Current Listings</h2>
+{% if jobs %}
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Company</th>
+                <th>Type</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for job in jobs %}
+            <tr>
+                <td><strong>{{ job.job_title }}</strong></td>
+                <td>{{ job.company_name }}</td>
+                <td>{{ job.job_type }}</td>
+                <td>
+                    <a href="{{ url_for('jobs', edit=job.job_id) }}" class="btn" style="background: #e2e8f0; color: #475569;">Edit</a>
+                    <a href="{{ url_for('delete_job_route', id=job.job_id) }}" class="btn btn-danger" onclick="return confirm('Delete this job?')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No jobs found.</p>
+{% endif %}
+{% endblock %}
