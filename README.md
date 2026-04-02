@@ -1,26 +1,31 @@
 # Job Application Tracker
 
-A web application to help track job applications during the job
-search process.
+A comprehensive full-stack web application designed to organize and optimize the job search process, featuring a relational database and a skill-matching engine.
 
-## Features (Coming Soon)
-- Track companies and job listings
-- Record application submissions
-- Manage interview schedules
-- Store contact information
+## 🚀 Features
+- **Company Management**: Track industries, locations, and personal notes for target employers.
+- **Job Listings**: Log roles, salary ranges, and technical requirements.
+- **Application Tracking**: Monitor the status of every application (Applied, Interview, Offer, etc.) with resume version tracking.
+- **Networking Contacts**: Store key contacts, LinkedIn profiles, and emails linked to specific companies.
+- **Job Match Engine**: Algorithmic matching that compares your skills against job requirements to calculate a match percentage.
 
-## Technologies
-- MySQL Database
-- Python with Flask
-- HTML/CSS for the web interface
+## 🛠️ Technologies
+- **Backend**: Python 3 with Flask
+- **Database**: MySQL 8.0+
+- **Frontend**: HTML, CSS (Custom responsive design)
 
-## Testing
+## ⚙️ Setup & Installation (Testing)
 
 ### 1. Database Setup
-1. Install MySQL Server.
-2. Run the schema script to create the database and tables:
+1. Clone the Repository. Ensure you have install MySQL Server and it is running.
+
+2. Open the terminal, navigate to the project root folder ```bash /Job-Application-Tracker```, and run the schema script to create the database and tables:
    - **macOS/Linux:** `mysql -u root -p < schema.sql`
    - **Windows:** `mysql -u root -p < schema.sql` (Ensure MySQL is in your System PATH)
+
+#### 💡 Troubleshooting Note
+
+Stuck on "Command Not Found"? > If your terminal doesn't recognize pip, python, or mysql, use an AI assistant to help you add these tools to your system's PATH. Simply paste the error you're seeing, and it will guide you through the specific steps for your OS.
 
 ### 2. Environment Variable (.env)
 
@@ -34,6 +39,8 @@ DB_NAME=job_tracker
 ```
 
 ### 3. Python Environment Setup
+Open the terminal and run the commands:
+
 #### macOS / Linux
 ```bash
 # Create virtual environment
