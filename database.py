@@ -221,3 +221,9 @@ def update_contact(contact_id, data):
 
 def delete_contact(contact_id):
     return execute_query("DELETE FROM contacts WHERE contact_id = %s", (contact_id,))
+
+# MATCH JOB DATA LOGIC
+def get_all_jobs_for_matching():
+    """Fetches jobs and their requirements for the matching algorithm."""
+    query = "SELECT j.job_id, j.job_title, j.requirements, c.company_name FROM jobs j JOIN companies c ON j.company_id = c.company_id"
+    return execute_query(query, fetch=True)

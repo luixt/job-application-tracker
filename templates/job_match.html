@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Job Match{% endblock %}
+
+{% block content %}
+<h1>Skill Matcher</h1>
+<p class="text-secondary">Enter your current skills to see which jobs in your database are the best fit based on their requirements.</p>
+
+<div class="card" style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+    <form method="POST">
+        <label><strong>Your Skills:</strong> (comma separated)</label>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <input type="text" name="skills" value="{{ user_skills }}" placeholder="e.g. Python, SQL, Flask" required style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+            <button type="submit" class="btn btn-primary">Calculate Match</button>
+        </div>
+    </form>
+</div>
+
+{% if results %}
+    <h2>Matching Results</h2>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Job & Company</th>
+                    <th>Match %</th>
+                    <th>Skill Breakdown</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for res in results %}
+                <tr>
+                    <td>
+                        <strong>{{ res.job_title }}</strong>
+                        <span class="text-secondary">{{ res.company }}</span>
+                    </td>
+                    <td>
+                        <div class="{% if res.percent > 70 %}match-high{% else %}match-low{% endif %}">
+                            {{ res.percent }}%
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 5px;">
+                            {% for skill in res.matched_skills %}
+                                <span class="badge skill-tag-match">✓ {{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                            {% for skill in res.missing_skills %}
+                                <span class="badge skill-tag-missing">× {{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% elif user_skills %}
+    <div style="background: #fff; padding: 40px; text-align: center; border-radius: 8px; border: 1px dashed #ccc;">
+        <p style="color: #64748b;">No jobs found that match those skills. Try adding more jobs with requirements!</p>
+    </div>
+{% endif %}
+{% endblock %}

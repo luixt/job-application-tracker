@@ -6,7 +6,7 @@ from database import (
     get_all_jobs, create_job, delete_job, get_job_by_id, update_job,
     get_all_applications, get_application_by_id, create_application, 
     update_application, delete_application, get_all_contacts, get_contact_by_id, 
-    create_contact, update_contact, delete_contact
+    create_contact, update_contact, delete_contact, get_all_jobs_for_matching
 )
 
 app = Flask(__name__)
@@ -219,9 +219,44 @@ def delete_contact_route(id):
 
 
 # -- MATCHING JOB ---
-@app.route('/match')
+@app.route('/match', methods=['GET', 'POST'])
 def job_match():
-    return render_template('job_match.html')
+    results = []
+    user_skills = ""
+    
+    if request.method == 'POST':
+        user_skills = request.form.get('skills', '')
+        # Clean user input into a set of lowercase skills
+        user_skills_set = {s.strip().lower() for s in user_skills.split(',') if s.strip()}
+        
+        all_jobs = get_all_jobs_for_matching()
+        
+        for job in all_jobs:
+            # Parse the JSON requirements from the DB
+            job_reqs = json.loads(job['requirements']) if job['requirements'] else []
+            job_reqs_set = {r.lower() for r in job_reqs}
+            
+            if not job_reqs_set:
+                continue
+                
+            # Find the intersection (matches)
+            matches = user_skills_set.intersection(job_reqs_set)
+            missing = job_reqs_set - user_skills_set
+            
+            match_percent = round((len(matches) / len(job_reqs_set)) * 100)
+            
+            results.append({
+                'job_title': job['job_title'],
+                'company': job['company_name'],
+                'percent': match_percent,
+                'matched_skills': list(matches),
+                'missing_skills': list(missing)
+            })
+            
+        # Sort results by percentage (highest first)
+        results = sorted(results, key=lambda x: x['percent'], reverse=True)
+
+    return render_template('job_match.html', results=results, user_skills=user_skills)
 
 if __name__ == '__main__':
     app.run(debug=True)

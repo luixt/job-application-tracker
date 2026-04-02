@@ -191,3 +191,26 @@ th, td {
 .badge-offer { background: #dcfce7; color: #166534; }      /* Green */
 .badge-rejected { background: #fee2e2; color: #991b1b; }   /* Red */
 .badge-withdrawn { background: #f1f5f9; color: #475569; }  /* Gray */
+
+/* for match job page */
+.match-high {
+    color: var(--success);
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.match-low {
+    color: var(--primary);
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.skill-tag-match {
+    background: #dcfce7 !important; /* Soft green */
+    color: #166534 !important;
+}
+
+.skill-tag-missing {
+    background: #fee2e2 !important; /* Soft red */
+    color: #991b1b !important;
+}
