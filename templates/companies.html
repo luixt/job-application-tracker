@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Companies{% endblock %}
+
+{% block content %}
+<h1>Company Management</h1>
+
+<div class="card" style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+    <h3>Add New Company</h3>
+    <form method="POST" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <input type="text" name="company_name" placeholder="Company Name" required style="padding: 10px;">
+        <input type="text" name="industry" placeholder="Industry" style="padding: 10px;">
+        <input type="url" name="website" placeholder="Website (https://...)" style="padding: 10px;">
+        <input type="text" name="city" placeholder="City" style="padding: 10px;">
+        <input type="text" name="state" placeholder="State" style="padding: 10px;">
+        <textarea name="notes" placeholder="Notes" style="grid-column: span 2; padding: 10px;"></textarea>
+        <button type="submit" class="btn btn-primary" style="grid-column: span 2;">Save Company</button>
+    </form>
+</div>
+
+<h2>Registered Companies</h2>
+{% if companies %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Industry</th>
+                <th>Location</th>
+                <th>Website</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for company in companies %}
+            <tr>
+                <td><strong>{{ company.company_name }}</strong></td>
+                <td>{{ company.industry }}</td>
+                <td>{{ company.city }}, {{ company.state }}</td>
+                <td><a href="{{ company.website }}" target="_blank">Visit Site</a></td>
+                <td>
+                    <a href="#" class="btn" style="background: #e2e8f0; color: #475569;">Edit</a>
+                    <a href="#" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No companies found. Use the form above to add your first one!</p>
+{% endif %}
+{% endblock %}
