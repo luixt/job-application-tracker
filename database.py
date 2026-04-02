@@ -44,3 +44,22 @@ def execute_query(query, params=None, fetch=False):
     finally:
         cursor.close()
         conn.close()
+
+# COMPANIES DATA LOGIC
+def get_all_companies():
+    return execute_query("SELECT * FROM companies ORDER BY company_name ASC", fetch=True)
+
+def create_company(data):
+    query = """
+        INSERT INTO companies (company_name, industry, website, city, state, notes)
+        VALUES (%s, %s, %s, %s, %s, %s)
+    """
+    params = (
+        data['name'], data['industry'], data['website'], 
+        data['city'], data['state'], data['notes']
+    )
+    return execute_query(query, params)
+
+def delete_company(company_id):
+    return execute_query("DELETE FROM companies WHERE company_id = %s", (company_id,))
+

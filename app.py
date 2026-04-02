@@ -1,35 +1,42 @@
 from flask import Flask, render_template, request, redirect, flash, url_for
-from database import execute_query
+# Import all our data functions from database.py
+from database import (
+    get_dashboard_stats, 
+    get_recent_applications, 
+    get_all_companies, 
+    create_company
+)
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'
+app.secret_key = 'supersecretkey' # Required for session-based flash messages
 
+# --- DASHBOARD ---
 @app.route('/')
 def dashboard():
-    comp_count = execute_query("SELECT COUNT(*) as count FROM companies", fetch=True)[0]['count']
-    job_count = execute_query("SELECT COUNT(*) as count FROM jobs", fetch=True)[0]['count']
-    app_count = execute_query("SELECT COUNT(*) as count FROM applications", fetch=True)[0]['count']
-    
-    recent_apps = execute_query("""
-        SELECT a.application_date, j.job_title, c.company_name, a.status 
-        FROM applications a
-        JOIN jobs j ON a.job_id = j.job_id
-        JOIN companies c ON j.company_id = c.company_id
-        ORDER BY a.application_date DESC LIMIT 5
-    """, fetch=True)
-
-    stats = {
-        'companies': comp_count,
-        'jobs': job_count,
-        'applications': app_count
-    }
-    
+    stats = get_dashboard_stats()
+    recent_apps = get_recent_applications()
     return render_template('dashboard.html', stats=stats, recent_apps=recent_apps)
 
-@app.route('/companies')
+# --- COMPANIES ---
+@app.route('/companies', methods=['GET', 'POST'])
 def companies():
-    return render_template('companies.html')
+    if request.method == 'POST':
+        company_data = {
+            'name': request.form.get('company_name'),
+            'industry': request.form.get('industry'),
+            'website': request.form.get('website'),
+            'city': request.form.get('city'),
+            'state': request.form.get('state'),
+            'notes': request.form.get('notes')
+        }
+        create_company(company_data)
+        flash(f"Company '{company_data['name']}' added!", "success")
+        return redirect(url_for('companies'))
 
+    companies_list = get_all_companies()
+    return render_template('companies.html', companies=companies_list)
+
+# --- PLACEHOLDERS FOR NEXT STEPS ---
 @app.route('/jobs')
 def jobs():
     return render_template('jobs.html')
