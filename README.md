@@ -14,6 +14,8 @@ search process.
 - Python with Flask
 - HTML/CSS for the web interface
 
+## Testing
+
 ### 1. Database Setup
 1. Install MySQL Server.
 2. Run the schema script to create the database and tables:
