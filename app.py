@@ -3,7 +3,9 @@ from flask import Flask, json, render_template, request, redirect, flash, url_fo
 from database import (
     get_dashboard_stats, get_recent_applications, get_all_companies, 
     create_company, get_company_by_id, update_company, delete_company, 
-    get_all_jobs, create_job, delete_job, get_job_by_id, update_job
+    get_all_jobs, create_job, delete_job, get_job_by_id, update_job,
+    get_all_applications, get_application_by_id, create_application, 
+    update_application, delete_application
 )
 
 app = Flask(__name__)
@@ -136,10 +138,46 @@ def delete_job_route(id):
     return redirect(url_for('jobs'))
 
 # --- APPLICATIONS ---
-@app.route('/applications')
+@app.route('/applications', methods=['GET', 'POST'])
 def applications():
-    return render_template('applications.html')
+    edit_id = request.args.get('edit')
+    app_to_edit = None
+    if edit_id:
+        app_to_edit = get_application_by_id(edit_id)
 
+    if request.method == 'POST':
+        app_data = {
+            'job_id': request.form.get('job_id'),
+            'date': request.form.get('application_date'),
+            'status': request.form.get('status'),
+            'resume': request.form.get('resume_version'),
+            'cv_sent': 1 if request.form.get('cover_letter_sent') else 0,
+            'interview_json': json.dumps({}) # Placeholder for future feature
+        }
+        
+        app_id = request.form.get('application_id')
+        if app_id:
+            update_application(app_id, app_data)
+            flash("Application updated!", "success")
+        else:
+            create_application(app_data)
+            flash("Application tracked!", "success")
+        return redirect(url_for('applications'))
+
+    return render_template('applications.html', 
+                           applications=get_all_applications(),
+                           jobs=get_all_jobs(), # Needed for the dropdown
+                           edit_mode=app_to_edit)
+
+@app.route('/applications/delete/<int:id>')
+def delete_application_route(id):
+    delete_application(id)
+    flash("Application deleted.", "danger")
+    return redirect(url_for('applications'))
+
+
+
+# --- CONTACTS ---
 @app.route('/contacts')
 def contacts():
     return render_template('contacts.html')

@@ -152,3 +152,40 @@ def update_job(job_id, data):
 
 def delete_job(job_id):
     return execute_query("DELETE FROM jobs WHERE job_id = %s", (job_id,))
+
+# APPLICATIONS DATA LOGIC
+def get_all_applications():
+    """Fetches applications with detailed Job and Company info."""
+    query = """
+        SELECT a.*, j.job_title, j.job_url, c.company_name 
+        FROM applications a
+        JOIN jobs j ON a.job_id = j.job_id
+        JOIN companies c ON j.company_id = c.company_id
+        ORDER BY a.application_date DESC
+    """
+    return execute_query(query, fetch=True)
+
+def get_application_by_id(app_id):
+    return execute_query("SELECT * FROM applications WHERE application_id = %s", (app_id,), fetch=True)[0]
+
+def create_application(data):
+    query = """
+        INSERT INTO applications (job_id, application_date, status, resume_version, cover_letter_sent, interview_data)
+        VALUES (%s, %s, %s, %s, %s, %s)
+    """
+    params = (data['job_id'], data['date'], data['status'], data['resume'], data['cv_sent'], data['interview_json'])
+    return execute_query(query, params)
+
+def update_application(app_id, data):
+    query = """
+        UPDATE applications 
+        SET job_id=%s, application_date=%s, status=%s, resume_version=%s, cover_letter_sent=%s
+        WHERE application_id=%s
+    """
+    params = (data['job_id'], data['date'], data['status'], data['resume'], data['cv_sent'], app_id)
+    return execute_query(query, params)
+
+def delete_application(app_id):
+    return execute_query("DELETE FROM applications WHERE application_id = %s", (app_id,))
+
+# CONTACTS DATA LOGIC

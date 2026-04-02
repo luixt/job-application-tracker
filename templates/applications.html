@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Applications{% endblock %}
+
+{% block content %}
+<h1>Application Tracking</h1>
+
+<div class="card {% if edit_mode %}edit-highlight{% endif %}" style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+    <h3>{% if edit_mode %}Edit Application{% else %}Track New Application{% endif %}</h3>
+    <form method="POST" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <input type="hidden" name="application_id" value="{{ edit_mode.application_id if edit_mode else '' }}">
+
+        <select name="job_id" required style="padding: 10px;">
+            <option value="">-- Select Job --</option>
+            {% for job in jobs %}
+                <option value="{{ job.job_id }}" {% if edit_mode and edit_mode.job_id == job.job_id %}selected{% endif %}>
+                    {{ job.job_title }} at {{ job.company_name }}
+                </option>
+            {% endfor %}
+        </select>
+        
+        <input type="date" name="application_date" required style="padding: 10px;"
+               value="{{ edit_mode.application_date if edit_mode else '' }}">
+        
+        <select name="status" style="padding: 10px;">
+            {% for s in ['Applied', 'Screening', 'Interview', 'Offer', 'Rejected', 'Withdrawn'] %}
+                <option value="{{ s }}" {% if edit_mode and edit_mode.status == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        
+        <input type="text" name="resume_version" placeholder="Resume Version (e.g. V1_Tech)" style="padding: 10px;"
+               value="{{ edit_mode.resume_version if edit_mode else '' }}">
+        
+        <label style="grid-column: span 2; display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            <input type="checkbox" name="cover_letter_sent" {% if edit_mode and edit_mode.cover_letter_sent %}checked{% endif %}> 
+            Cover Letter Sent
+        </label>
+        
+        <div style="grid-column: span 2; display: flex; gap: 10px;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">
+                {% if edit_mode %}Update Tracking{% else %}Track Application{% endif %}
+            </button>
+            {% if edit_mode %}
+                <a href="{{ url_for('applications') }}" class="btn btn-cancel" style="flex: 1;">Cancel Edit</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Job & Company</th>
+                <th>Status</th>
+                <th>Details</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in applications %}
+            <tr>
+                <td>{{ app.application_date }}</td>
+                <td>
+                    {% if app.job_url %}
+                        <a href="{{ app.job_url }}" target="_blank" class="job-link"><strong>{{ app.job_title }}</strong> ↗</a>
+                    {% else %}
+                        <strong>{{ app.job_title }}</strong>
+                    {% endif %}
+                    <span class="text-secondary">{{ app.company_name }}</span>
+                </td>
+                <td>
+                    <span class="badge badge-{{ app.status | lower }}">{{ app.status }}</span>
+                </td>
+                <td>
+                    <span class="text-secondary">Resume: {{ app.resume_version or 'N/A' }}</span>
+                    <span class="text-secondary">CV Sent: {{ '✅' if app.cover_letter_sent else '❌' }}</span>
+                </td>
+                <td style="text-align: right;">
+                    <a href="{{ url_for('applications', edit=app.application_id) }}" class="btn btn-edit">Edit</a>
+                    <a href="{{ url_for('delete_application_route', id=app.application_id) }}" class="btn btn-danger" style="padding: 5px 10px;" onclick="return confirm('Delete application record?')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
